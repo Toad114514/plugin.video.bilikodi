@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<settings>
+    <section id="plugin.video.bilikodi">
+       <category id="generate" label="全局设定">
+         <group id="1">
+            <setting type="file" id="sublist" label="使用其他本地关注列表数据（兼容PipePipe订阅数据）" default=""/>
+         </group>
+       </category>
+    </section>
+</settings>

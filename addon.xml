@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.bilikodi" name="bili.kodi" version="1.0.23" provider-name="toad114514">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.requests" version="2.12.4"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <summary lang="en">bili.kodi</summary>
+    <summary lang="zh_CN">bili.kodi</summary>
+    <description lang="en">A bilibili client in kodi</description>
+    <description lang="zh_CN">一个在Kodi上面跑的b站客户端（完全免费，Nexus 20 版本通过测试）[CR]该插件允许你在Kodi中访问b张，查看你喜欢的视频、关注你喜欢的Up主（本地存储）、自由的随意浏览b站上的内容（例如看祖卡炸凉屋）</description>
+  <website>https://www.bilibili.com</website>
+  <source>https://github.com/toad114514/plugin.video.bilikodi</source>
+    <email>xiaolan2332021@163.com</email>
+    <assets>
+        <icon>icon.png</icon>
+        <fanart>fanart.png</fanart>
+    </assets>
+    <disclaimer>这个初二老给你们拉了坨大的[头盔]</disclaimer>
+  <news>
+# v1.0.23
+完成up主的查看和稿件查看
+# v1.02
+原来我没加 platform=html5 哇
+# v1.01
+我的第一个发温版本
+</news>
+  </extension>
+</addon>
