@@ -47,12 +47,19 @@ def getWbiKeys() -> tuple[str, str]:
     sub_key = sub_url.rsplit('/', 1)[1].split('.')[0]
     return img_key, sub_key
 
-def getwbikey(params):
+def getwbip(**kwargs):
+    """
+    将请求参数进行 wbikey 签名，以获得神人b站带wbi签名的api结果
+    签名实现拿api demo套的
+    
+    :params kwargs: 请求参数, 得 args=value 这么填
+    :return: 一个十分完美的 url 参数返回结果（带wbikey参数）
+    """
     img_key, sub_key = getWbiKeys()
     signed_params = encWbi(
-    params=params,
-    img_key=img_key,
-    sub_key=sub_key
+        params=kwargs,
+        img_key=img_key,
+        sub_key=sub_key
     )
     query = urllib.parse.urlencode(signed_params)
     return query

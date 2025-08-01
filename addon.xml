@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.bilikodi" name="bili.kodi" version="1.0.23" provider-name="toad114514">
+<addon id="plugin.video.bilikodi" name="bilikodi" version="1.0.30+0719" provider-name="toad114514">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.requests" version="2.12.4"/>
+    <import addon="script.module.xbmcswift2" version="2.4.0"/>
+    <import addon="script.module.pyqrcode" version="1.2.0"/>
+    <import addon="script.module.beautifulsoup4" version="1.0.2"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="addon.py">
     <provides>video</provides>
@@ -11,8 +14,11 @@
     <platform>all</platform>
     <summary lang="en">bili.kodi</summary>
     <summary lang="zh_CN">bili.kodi</summary>
-    <description lang="en">A bilibili client in kodi</description>
-    <description lang="zh_CN">一个在Kodi上面跑的b站客户端（完全免费，Nexus 20 版本通过测试）[CR]该插件允许你在Kodi中访问b张，查看你喜欢的视频、关注你喜欢的Up主（本地存储）、自由的随意浏览b站上的内容（例如看祖卡炸凉屋）</description>
+    <description lang="en">[WIP][DEV] An Unofficial third-party bilibili client on kodi</description>
+    <description lang="zh_CN">
+[WIP][DEV] 一个非官方的第三方b站客户端 on Kodi（kodi 20.2可用）
+然后代码写的依托所以喷我轻点
+    </description>
   <website>https://www.bilibili.com</website>
   <source>https://github.com/toad114514/plugin.video.bilikodi</source>
     <email>xiaolan2332021@163.com</email>
@@ -20,12 +26,39 @@
         <icon>icon.png</icon>
         <fanart>fanart.png</fanart>
     </assets>
-    <disclaimer>这个初二老给你们拉了坨大的[头盔]</disclaimer>
-  <news>
+    <disclaimer>
+特别鸣谢 SocialSisterYi/bilibili-API-collect 提供api整理和用法
+本插件与哔哩哔哩官方无任何联系，也没有受到哔哩哔哩官方的授权。
+本插件仅供学习参考使用，本插件不会通过任何手段收集你的信息。
+（我都没钱开服务器我还收集我收你个鸡毛）
+    </disclaimer>
+  <news># 1.0.42
+重构主页推荐函数
+# 1.0.41
+主页翻页实现
+# 1.0.40
+Up主详细函数
+# v1.0.38
+新增播放提交到历史记录（手机端可看到该插件查看过的历史记录，Web电脑端形式）
+# v1.0.37
+新版播放器函数，可选分辨率播放
+# v1.0.36
+设置调整，修复wbi签名函数部分bug
+# v1.0.35
+个人已关注页面
+# v1.0.34
+尝试刷新cookies以规避b站风控（未测试
+# v1.0.32
+新版播放器详细与测试
+# v1.0.30+0719
+二维码登录，本地cookies和refresh_token存储
+# v1.0.25
+删掉了神人的本地关注列表，并决定登录才能使
+## 2023.12 前更新
 # v1.0.23
-完成up主的查看和稿件查看
+完成up主的查看和稿件查看[DEV]
 # v1.02
-原来我没加 platform=html5 哇
+原来我没加 platform=html5 哇[暂时]
 # v1.01
 我的第一个发温版本
 </news>

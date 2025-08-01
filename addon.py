@@ -1,8 +1,24 @@
+###############################
+#          Bilikodi addon.py
+#     插件入口，包含一个比较完整的路由框架
+###############################
+
 import os, sys, requests, json, random, string
 import xbmc, xbmcaddon, xbmcgui, xbmcplugin, xbmcvfs
 from urllib.parse import urlencode, parse_qsl
 # wbikey
 import resources.lib.wbi as wbi
+import resources.login as login
+# xbmc
+from resources.lib.xbmc import *
+from resources.lib.cookie import *
+from resources.lib.player import *
+from resources.lib.core import *
+from resources.lib.up import *
+from resources.lib.action import *
+#version
+version="v1.0.32"
+dev=True
 
 # urls
 URL = sys.argv[0]
@@ -29,250 +45,29 @@ UA_head = {
 # UA_head["referer"] = "www.bilibili.com"
 #apiurl="https://api.bilibili.com/x/web-interface/"
 
+######$$$$$######
+#   Fuck this!
+#################
+# 以前写的代码还是太石了
+# 这一堆石山代码我肯定要k飞的
+# 后面找时间重构部分函数
+#      toadXtech64 08.01 正好兄弟生日
+#################
+
+# 提醒我 上下文菜单 更新条目用 Container.Update()
 
 #######
 # Global function
 #######
-def warDialog(msg):
-    xbmc.log("[plugin.video.bilikodi] [Err]: "+msg, xbmc.LOGERROR)
-    xbmcgui.Dialog().notification(
-        heading=ADDON_name,
-        message=msg,
-        time=3000
-    )
     
 def log(string):
     strings = "[plugin.video.bilikodi](info): "+string
     xbmc.log(strings, xbmc.LOGINFO)
-    
-
-def get_url(**kwargs):
-    """
-    Create a URL for calling the plugin recursively from the given set of keyword arguments.
-
-    :param kwargs: "argument=value" pairs
-    :return: plugin call URL
-    :rtype: str
-    """
-    return '{}?{}'.format(URL, urlencode(kwargs))
-
-def check_json(jsondata):
-    try:
-        data = json.loads(jsondata)
-        return True
-    except:
-        return False
 
 def getcookie():
     res = requests.session().post("https://www.bilibili.com", headers=UA_head)
     return res.cookies.get_dict()
 
-def get_cid(bv):
-    try:
-        data=requests.get("https://api.bilibili.com/x/web-interface/view?bvid="+bv,headers=UA_head)
-    except requests.exceptions.RequestException as e:
-        data=""
-        return False
-    if check_json(data.text):
-        res_text=json.loads(data.text)
-        if res_text["code"] == 0:
-            return res_text["data"]["cid"]
-        else:
-            return False
-    else:
-        return False
-
-def bvideoplay(bv):
-    cid=get_cid(bv)
-    if cid:
-        # data=requests.get("https://api.bilibili.com/x/player/playurl?bvid="+bv+"&cid="+str(cid)+"&qn=16&fnval=16", headers=UA_head)
-        data=requests.get("https://api.bilibili.com/x/player/playurl?bvid="+bv+"&cid="+str(cid)+"&qn=16&platform=html5", headers=UA_head)
-        if check_json(data.text):
-            res_text=json.loads(data.text)
-            log(data.text)
-            print(data.text)
-            if res_text["code"] == 0:
-                # url=res_text["data"]["dash"]["video"][0]["baseUrl"]
-                url=res_text["data"]["durl"][0]["url"]
-                # url=download_video(urlbase)
-                play_item = xbmcgui.ListItem(offscreen=True)
-                play_item.setPath(url)
-                log("播放视频 "+url)
-                xbmcplugin.setResolvedUrl(HANDLE, True, listitem=play_item)
-            else:
-                warDialog("数据返回了错误的代码: "+str(res_text["code"]))
-        else:
-            warDialog("无法解析 json 数据")
-    else:
-        warDialog("无法获取 cid")
-######
-# GetVideo_list
-######
-
-#########
-# UserGet
-#########
-
-# getuser info
-# params action="getuserinfo"&mid=mid
-
-def getuserinfo(mid):
-    try:
-        f=open(os.path.join(ADDON_PATH, "resources", "config", "sub_list.json"),"r")
-        sublist=f.read()
-        f.close()
-    except:
-        sublist=False
-    try:
-        res=requests.get("https://api.bilibili.com/x/web-interface/card?mid="+mid, headers=UA_head)
-        res_text=res.text
-    except requests.exceptions.RequestException as e:
-        res_text=""
-        warDialog("无法从网上获取 json 数据")
-    if check_json(res_text):
-        xbmc.log(res_text, xbmc.LOGINFO)
-        ups_data=json.loads(res_text)
-        if ups_data["code"] == 0:
-            xbmcplugin.setPluginCategory(HANDLE, ups_data["data"]["card"]["name"])
-            # info
-            upsinfo=ups_data["data"]["card"]["sign"]+"\n[COLOR=yellow]粉丝量："+str(ups_data["data"]["card"]["fans"])+"[/COLOR]"
-            list_item=xbmcgui.ListItem(ups_data["data"]["card"]["name"])
-            list_item.setArt({"icon": ups_data["data"]["card"]["face"]})
-            list_item.getVideoInfoTag().setPlot(upsinfo)
-            url=get_url(action=nothing)
-            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, False)
-
-            #### subscribe!!!!
-            if sublist:
-                sublist=json.loads(sublist)
-                submids=[]
-                for sub in sublist["sub"]:
-                    submids.append(str(sub["mid"]))
-                if str(mid) in submids:
-                    # is_sub
-                    list_item=xbmcgui.ListItem("取消关注")
-                    list_item.getVideoInfoTag().setPlot("如题")
-                    list_item.setArt({'icon': folder_icon})
-                    url=get_url(action="unsub", mid=mid)
-                    xbmcplugin.addDirectoryItem(HANDLE, url, list_item, True)
-                else:
-                    # is not sub
-                    list_item=xbmcgui.ListItem("关注")
-                    list_item.getVideoInfoTag().setPlot("如题")
-                    list_item.setArt({'icon': folder_icon})
-                    url=get_url(action="sub", mid=mid)
-                    xbmcplugin.addDirectoryItem(HANDLE, url, list_item, True)
-            else:
-                # no sub_list.json them pass
-                pass
-            
-            # videossssss
-            list_item=xbmcgui.ListItem("投稿")
-            list_item.getVideoInfoTag().setPlot("Up主的视频信息列表")
-            list_item.setArt({'icon': folder_icon})
-            url=get_url(action="dynamic_get", mid=mid, page=0)
-            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, True)
-            
-            # season
-            list_item=xbmcgui.ListItem("合集视频")
-            list_item.getVideoInfoTag().setPlot("Up主的合集视频")
-            list_item.setArt({'icon': folder_icon})
-            url=get_url(action="season", mid=mid)
-            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, True)
-            xbmcplugin.endOfDirectory(HANDLE)
-        elif ups_data["code"] == -404:
-            warDialog("没找到"+mid+"对应的up主")
-        else:
-            warDialog("数据返回了错误的代码: "+str(res_json["code"]))
-    else:
-        warDialog("无法解析 json 数据")
-        log(res_text)
-
-
-def unsub(mid):
-    # load sub_list.json
-    log("params-mid"+mid)
-    with open(os.path.join(ADDON_PATH, "resources", "config", "sub_list.json"),"r") as f:
-        f_text=f.read()
-    sublist=json.loads(f_text)
-    # for
-    for i in range(len(sublist["sub"])):
-        log(sublist["sub"][i]["mid"])
-        if sublist["sub"][i]["mid"] == mid:
-            sublist["sub"].pop(i)
-            log("del done")
-            os.remove(os.path.join(ADDON_PATH, "resources", "config", mid+".jpg"))
-            break
-        else:
-            pass
-    # rewrite
-    with open(os.path.join(ADDON_PATH, "resources", "config", "sub_list.json"),"w") as f:
-        f.write(json.dumps(sublist))
-    xbmcgui.Dialog().ok(ADDON_name,"已取消关注该Up主")
-    
-def sub(mid):
-    # get sub_list.json
-    with open(os.path.join(ADDON_PATH, "resources", "config", "sub_list.json"),"r") as f:
-        f_text=f.read()
-    sublist=json.loads(f_text)
-    try:
-        # get biliapi json
-        res=requests.get("https://api.bilibili.com/x/web-interface/card?mid="+mid, headers=UA_head)
-    # if err in gets
-    except requests.exceptions.RequestException as e:
-        res_text=""
-        warDialog("无法从网上获取 json 数据")
-    # loads res_text to dict
-    get=json.loads(res.text)
-    # download ups img
-    face_path = os.path.join(ADDON_PATH, "resources", "config", "face")
-    with open(os.path.join(face_path, str(mid)+".jpg"),"wb") as face_file:
-        # get ups face file
-        res=requests.get(get["data"]["card"]["face"])
-        # write img binary in file [mid].jpg
-        face_file.write(res.content)
-    # create a dict about ups info
-    sub_info={'mid': mid,'name': get["data"]["card"]["name"], 'face': str(mid)+'.jpg','desc': get["data"]["card"]["sign"], 'fans': get["data"]["card"]["fans"]}
-    # add them in sublist
-    sublist["sub"].append(sub_info)
-    # rewrite to sub_list.json
-    with open(os.path.join(ADDON_PATH, "resources", "config", "sub_list.json"),"w") as f:
-        f.write(json.dumps(sublist))
-    xbmcgui.Dialog().ok(ADDON_name,"已关注该Up主\n请退出重进本列表")
-
-# getuserdynamic
-# Get Error -799(请求频繁)
-def getuserdynamic(mid,page):
-    try:
-        res=requests.get("https://api.bilibili.com/x/space/arc/search?mid="+mid, headers=UA_head)
-        res_text=res.text
-    except requests.exceptions.RequestException as e:
-        res_text=""
-        warDialog("无法从网上获取 json 数据")
-    if check_json(res_text):
-        log(res_text)
-        res_text=json.loads(res_text)
-        if res_text["code"] == 0:
-            xbmcplugin.setPluginCategory(HANDLE, "投稿")
-            for video in res_text["data"]["list"]["vlist"]:
-                list_item = xbmcgui.ListItem(video["title"])
-                url = get_url(action='play_video', bv=video["bvid"])
-                list_item.getVideoInfoTag().setPlot(video['description'])
-                list_item.setArt({'icon': video["pic"], 'fanart': video["pic"]})
-                list_item.setProperty('IsPlayable', 'true')
-                xbmcplugin.addDirectoryItem(HANDLE, url, list_item, False)
-            # nextpage
-            list_item = xbmcgui.ListItem("下一页")
-            url=get_url(action="dynamic_get", mid=mid, page=page+1)
-            list_item.getVideoInfoTag().setPlot("下一页")
-            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, True)
-            xbmcplugin.endOfDirectory(HANDLE)
-        else:
-            warDialog("数据返回了错误的代码: "+str(res_text["code"]))
-    else:
-        warDialog("无法解析 json 数据")
-        log(res_text)
-        
 ########
 # Tplist
 ########
@@ -339,99 +134,87 @@ def season_list(mid):
 #######
 # MenuList
 #######
-def addXbmcItem(label,param,is_folder):
-    list_item = xbmcgui.ListItem(label)
-    info_tag = list_item.getVideoInfoTag()
-    info_tag.setMediaType('video')
-    info_tag.setTitle(label)
-    list_item.setArt({'icon': folder_icon, 'fanart': fanart_bg})
-    url=get_url(action=param)
-    xbmcplugin.addDirectoryItem(HANDLE, url, list_item, is_folder)
-
-def addXbmcItemInfo(label,param,info,is_folder):
-    list_item = xbmcgui.ListItem(label)
-    info_tag = list_item.getVideoInfoTag()
-    info_tag.setMediaType('video')
-    info_tag.setTitle(label)
-    info_tag.setPlot(info)
-    list_item.setArt({'icon': folder_icon, 'fanart': fanart_bg})
-    url=get_url(action=param)
-    xbmcplugin.addDirectoryItem(HANDLE, url, list_item, is_folder)
 
 def mainmenu():
     if os.path.exists(os.path.join(ADDON_TempDir, "temp_video")) == False:
         os.mkdir(ADDON_TempDir)
         os.mkdir(os.path.join(ADDON_TempDir, "temp_video"))
-    xbmcplugin.setPluginCategory(HANDLE, '快乐老家')
+    if dev:
+        xbmcplugin.setPluginCategory(HANDLE, '[InWIP]主页')
+    else:
+        xbmcplugin.setPluginCategory(HANDLE, '主页')
     xbmcplugin.setContent(HANDLE, 'folder')
     # home tuijian
-    addXbmcItemInfo("推荐视频","home","b站的主页视频推荐\n仅能获取30条视频推荐\n过段时间会自动刷新",True)
+    addXbmcItemCustom("推荐视频",get_url(action="home", pn=1),"b站的主页视频推荐",True)
     addXbmcItem("前 100","top100",True)
-    addXbmcItemInfo("搜索","search","这个还没完善你先死一边去",True)
-    addXbmcItemInfo("本地关注列表","sublist","该功能灵感来自PipePipe\n数据文件存放于本插件根目录/resources/config/sub_list.json",True)
+    addXbmcItemCustom(
+        "关注列表",
+        get_url(action="ups_sub", mid=get_mid()),
+        "你最喜欢的关注的佬",
+        True,
+        icon=get_img("user")
+    )
+    addXbmcItemCustom("自己的用户信息",get_url(action="ups_me"),"看看你自己",True,icon=get_img("user"))
+    # addXbmcItemInfo("搜索","search","这个还没完善你先死一边去",True)
     addXbmcItem("跳转到...","tp",True)
     addXbmcItem("帮助","helper",True)
-    addXbmcItemInfo("wbikey","wbikey","Debug Option",True)
+    
+    """
+    Development Menu Items
+    """
+    if dev:
+        addXbmcItemCustom(
+            "特别警告！！",
+            get_url(action="dev"),
+            "特别警告，长按测试上下文菜单",
+            True,
+            context=[
+             ("Hello", "RunPlugin(plugin://plugin.video.bilikodi/?action=dev)"),
+             ("Me too", "RunPlugin(plugin://plugin.video.bilikodi/?action=helper)")
+            ]
+        )
+        addXbmcItemInfo("新版播放详情框架","player_test","Debug Option.\nThe new video info to show in development state.[WIP]",True)
+        addXbmcItemInfo("wbikey","wbikey","Debug Option",True)
+        addXbmcItemInfo("立即申请刷新 cookie 测试","ref_cookie","Debug Option",True)
     xbmcplugin.endOfDirectory(HANDLE)
 
-def gethomevideo():
-    try:
-        res=requests.get("https://api.bilibili.com/x/web-interface/index/top/feed/rcmd", headers=UA_head)
-        res_text=res.text
-    except requests.exceptions.RequestException as e:
-        res_text=""
-        warDialog("无法从网上获取 json 数据")
-    if check_json(res_text):
-        res_json=json.loads(res_text)
-        if res_json["code"] == 0:
-            if len(res_json["data"]["item"]) > 0:
-                xbmcplugin.setPluginCategory(HANDLE, '主页推荐')
-                for video in res_json["data"]["item"]:
-                    list_item = xbmcgui.ListItem(video["title"])
-                    url = get_url(action='play_video', bv=video["bvid"], cid=video["cid"])
-                    view="[COLOR=blue]"+str(video["stat"]["view"])+"[/COLOR]"
-                    like="[COLOR=red]"+str(video["stat"]["like"])+"[/COLOR]"
-                    owner="[COLOR=green]"+video["owner"]["name"]+"[/COLOR][COLOR=yellow] ("+str(video["owner"]["mid"])+")[/COLOR]"
-                    plot=video["title"]+"\n播放量 "+view+"\n点赞量 "+like+"\nUp主 "+owner
-                    list_item.getVideoInfoTag().setTitle(video['title'])
-                    list_item.getVideoInfoTag().setDuration(video['duration'])
-                    list_item.getVideoInfoTag().setWriters([video["owner"]["name"]])
-                    list_item.getVideoInfoTag().setPlot(plot)
-                    list_item.setArt({'icon': video["pic"], 'fanart': video["pic"]})
-                    list_item.setProperty('IsPlayable', 'true')
-                    xbmcplugin.addDirectoryItem(HANDLE, url, list_item, False)
-                xbmcplugin.endOfDirectory(HANDLE)
-            else:
-                warDialog("这里连吊都没有")
-        else:
-            warDialog("数据返回了错误的代码: "+str(res_json["code"]))
-    else:
-        warDialog("无法解析 json 数据")
-        log(res_text)
-
-# local subscribe list
-def getsublist():
-    try:
-        f=open(os.path.join(ADDON_PATH, "resources", "config", "sub_list.json"),"r")
-        res_text=f.read()
-        f.close()
-    except IOError as e:
-        warDialog("找不到 sub_list.json")
-    if check_json(res_text):
-        sublist=json.loads(res_text)
-        xbmcplugin.setPluginCategory(HANDLE, '本地关注')
-        for sub in sublist["sub"]:
-            face_path=os.path.join(ADDON_PATH,"resources","config","face",str(sub["mid"])+".jpg")
-            # info
-            upsinfo=sub["desc"]+"\n[COLOR=yellow]粉丝量："+str(sub["fans"])+"[/COLOR]"
-            list_item=xbmcgui.ListItem(sub["name"])
-            list_item.setArt({"icon": face_path})
-            list_item.getVideoInfoTag().setPlot(upsinfo)
-            url=get_url(action="getuserinfo", mid=sub["mid"])
-            xbmcplugin.addDirectoryItem(HANDLE, url, list_item, True)
+def gethomevideo(pn=1):
+    res=getbackAuto("https://api.bilibili.com/x/web-interface/index/top/feed/rcmd?fresh_idx="+str(pn))
+    if res != False:
+        xbmcplugin.setPluginCategory(HANDLE, '主页推荐')
+        for video in res["data"]["item"]:
+            # 描述
+            url = get_url(action='bvplay', bv=video["bvid"])
+            view="[COLOR=blue]"+str(video["stat"]["view"])+"[/COLOR]"
+            like="[COLOR=red]"+str(video["stat"]["like"])+"[/COLOR]"
+            owner="[COLOR=green]"+video["owner"]["name"]+"[/COLOR][COLOR=yellow] ("+str(video["owner"]["mid"])+")[/COLOR]"
+            plot=video["title"]+"\n\n播放量 "+view+"\n点赞量 "+like+"\nUp主 "+owner
+            plot+="\n\n长按进行其他操作"
+            # 提供上下文
+            bv=video["bvid"]
+            mid=video["owner"]["mid"]
+            # 内容
+            addXbmcItemCustom(
+                video["title"],
+                get_url(action='bvplay', bv=bv),
+                plot,
+                False,
+                icon=video["pic"],
+                fanart=video["pic"],
+                is_media=True,
+                context=[
+                  ("查看详细信息(会刷新推荐)", f"Container.Update(plugin://plugin.video.bilikodi/?action=player&bv={bv})"),
+                  ("跳转至UP主(同上)", f"Container.Update(plugin://plugin.video.bilikodi/?action=ups_info&mid={mid})")
+                  ]
+                )
+        # Next Pages
+        addXbmcItemCustom(
+          "[COLOR=yellow]下一页[/COLOR]",
+          get_url(action="home", pn=int(pn)+1),
+          "如题",
+          True
+        )
         xbmcplugin.endOfDirectory(HANDLE)
-    else:
-        warDialog("非正规json数据")
 
 def search():
     keyboard=xbmc.Keyboard()
@@ -445,7 +228,7 @@ def search():
         elif len(keyword) > 0:
             cookies=getcookie()
             try:
-                res=requests.get("https://api.bilibili.com/x/web-interface/search/all/v2?keyword="+keyword, headers=UA_head)
+                res=requests.get("https://api.bilibili.com/x/web-interface/search/all/v2?keyword="+keyword, headers=UA_head, cookies=get_cookie())
                 res_text=res.text
             except requests.exceptions.RequestException as e:
                 res_text=""
@@ -491,8 +274,14 @@ def helper():
     helper_text+="搜索中文时请确保安装了中文输入法\n"
     xbmcgui.Dialog().ok(ADDON_name+" 帮助", helper_text)
 
+def warning_dev():
+    helper_text="警告！！\n"
+    helper_text+="您正在使用 Dev 分支的 Bilikodi!!!!\n"
+    helper_text+="使用 Dev 版本可以获得更多的新功能\n但可能出现一大堆bug!\n使用 Dev 分支的 bilikodi 造成的后果本人均不负责!!\n"
+    xbmcgui.Dialog().ok(ADDON_name+" Warning!", helper_text)
+
 def nothing():
-    xbmcgui.Dialog().notification(ADDON_name,"该项里面啥也没有别找了（仅展示作用）")
+    xbmcgui.Dialog().notification(ADDON_name,"无内容弹窗。")
 
 # def clean():
     # if xbmcvfs.exists(ADDON_TempDir):
@@ -512,31 +301,43 @@ def router(pars):
         log("主页")
         mainmenu()
     elif params["action"] == "home":
-        log("获取主页推荐视频")
-        gethomevideo()
-    elif params["action"] == "play_video":
-        log("准备播放")
-        log("参数传入: "+params["bv"])
-        bvideoplay(params["bv"])
-    elif params["action"] == "search":
-        search()
+        log("获取主页推荐视频, 页码"+str(params["pn"]))
+        gethomevideo(pn=params["pn"])
+    # players 播放器
+    elif params["action"] == "player":
+        play_info(params["bv"], 0)
+    elif params["action"] == "videoplaylist":
+        videoplay_list(params["icon"], params["title"], params["bv"])
+    elif params["action"] == "bvplayR":
+        log("播放...（指定分辨率）")
+        bvstartp(params["bv"], qn=params["qn"])
+    elif params["action"] == "bvplay":
+        log("播放（默认分辨率）.....")
+        bvstartp(params["bv"])
+    # 其他杂项
     elif params["action"] == "helper":
         helper()
     elif params["action"] == "nothing":
         nothing()
     elif params["action"] == "wbikey":
         wbikeys()
+    # login
+    elif params["action"] == "qrcode":
+        login.qrcode_get()
+    ## 用户
     # user
+    elif params["action"] == "ups_me":
+        up_info(get_mid())
+    elif params["action"] == "ups_info":
+        up_info(params["mid"])
+    elif params["action"] == "ups_sub":
+        up_sub(params["mid"])
+    elif params["action"] == "ups_send":
+        up_video(params["mid"], pn=params["pn"])
     elif params["action"] == "dynamic_get":
         getuserdynamic(params["mid"], params["page"])
     elif params["action"] == "getuserinfo":
         getuserinfo(params["mid"])
-    elif params["action"] == "sublist":
-        getsublist()
-    elif params["action"] == "sub":
-        sub(params["mid"])
-    elif params["action"] == "unsub":
-        unsub(params["mid"])
     elif params["action"] == "season":
         season_list(params["mid"])
     # Tp_list
@@ -544,13 +345,36 @@ def router(pars):
         tp_list()
     elif params["action"] == "tp_user":
         tp_user_get()
+    # warning
+    elif params["action"] == "dev":
+        warning_dev()
+    elif params["action"] == "not":
+        nothing()
+    # dev
+    elif params["action"] == "ref_cookie":
+        cookie_ref(True)
+    elif params["action"] == "player_test":
+        play_info("BV1k7JazfEV2", 0) # 睡前必看，来自星野大叔的睡前问候
+        #play_info(113961538292695, 1) # linux大战比尔·盖茨 (2009年) (try get info by aid number.)
     else:
         raise ValueError(f'Invalid paramstring: {pars}!')
 
 ######
 # loop
 ######
+log("===========================")
+log("Bilikodi ("+version+") Route 路由框架重定向...")
+log(str(sys.argv[2][1:]))
+log("===========================")
 if __name__ == '__main__':
-    log("正在运行 Bilikodi... (v1.01)")
-    router(sys.argv[2][1:]) 
+    if login.check_login() == False:
+        xbmcgui.Dialog().ok("登录", "未检测到Cookies，需登录您的b站账号才能使用\n请转到插件设置选择一个方式登录\n（只是为了API稳定返回数据而已）")
+        # 仅允许通过 by qrcode
+        if sys.argv[2][1:] == "action=qrcode":
+            router(sys.argv[2][1:])
+        else:
+            sys.exit()
+    router(sys.argv[2][1:])
+    like_action("114514")
+    log(sys.argv[2][1:])
     

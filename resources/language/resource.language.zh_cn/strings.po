@@ -1,0 +1,52 @@
+msgid ""
+msgstr ""
+
+################################
+
+msgctxt "#30000"
+msgid "General"
+msgstr "全局"
+
+msgctxt "#30001"
+msgid "Login"
+msgstr "登录"
+
+msgctxt "#30002"
+msgid "By qrcode"
+msgstr "二维码登录"
+
+msgctxt "#30003"
+msgid "Video"
+msgstr "视频设定"
+
+msgctxt "#30004"
+msgid "Video Resolution"
+msgstr "视频分辨率"
+
+msgctxt "#30005"
+msgid "720P"
+msgstr "720P 高清"
+
+msgctxt "#30006"
+msgid "480P"
+msgstr "480P 清晰"
+
+msgctxt "#30007"
+msgid "360P"
+msgstr "360P 流畅"
+
+msgctxt "#30008"
+msgid "240P"
+msgstr "240P 极速"
+
+msgctxt "#30009"
+msgid "UI Preferences"
+msgstr "界面杂项"
+
+msgctxt "#30010"
+msgid "New default fanart"
+msgstr "新版默认同人图背景"
+
+msgctxt "#30011"
+msgid "Use new new default fanart image in this plugin (Super Mario Star Road OW2 frontside image), or use old default fanart (BSGM)"
+msgstr "使用新版插件默认同人图背景（Super Mario Star Road OW2 俯视图），否则使用旧版同人图背景（BSGM）"

@@ -1,9 +1,41 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<settings>
+<!-- <?xml version="1.0" encoding="UTF-8" standalone="yes"?> -->
+<?xml version="1.0" encoding="UTF-8"?>
+<settings version="1">
     <section id="plugin.video.bilikodi">
-       <category id="generate" label="全局设定">
-         <group id="1">
-            <setting type="file" id="sublist" label="使用其他本地关注列表数据（兼容PipePipe订阅数据）" default=""/>
+       <category id="generate" label="30000">
+         <group id="1" label="30001">
+            <setting id="qrcode_login" type="string" label="30002">
+                <default/>
+	        	<constraints>
+		    		<allowempty>true</allowempty>
+		    	</constraints>
+		    	<control type="button" format="action">
+		     		<data>RunPlugin(plugin://plugin.video.bilikodi/?action=qrcode)</data>
+		    	</control>
+	    	</setting>
+         </group>
+         <group id="2" label="30003">
+           <setting id="qn" type="integer" label="30004">
+	        	<default>32</default>
+				  <constraints>
+			     	<options>
+	                    <option label="30005">64</option>
+	                    <option label="30006">32</option>
+	                    <option label="30007">16</option>
+	                    <option label="30008">6</option>
+		    		</options>
+			    	</constraints>
+				  <control type="list" format="string">
+			    		<heading>30004</heading>
+				  </control>
+           </setting>
+         </group>
+         <group id="3" label="30009">
+           <setting id="fanart" type="boolean" label="30010" help="30011">
+		    	<level>0</level>
+	    		<default>true</default>
+				<control type="toggle"/>
+	    	</setting>
          </group>
        </category>
     </section>
