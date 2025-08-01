@@ -3,9 +3,14 @@
 <center>
 <img src="https://raw.github.com/Toad114514/plugin.video.bilikodi/refs/heads/main/icon.png" width="150" height="150"/>
 关于我找不到kodi的b站客户端于是自己手搓这件事<br>
-<img src="https://img.shields.io/github/stars/Toad114514/Staxle.svg"/><img src="https://img.shields.io/github/forks/Toad114514/Staxle.svg"/><img src="https://img.shields.io/github/issues/Toad114514/Staxle.svg"/><img src="https://img.shields.io/github/watchers/Toad114514/Staxle.svg"/><img src="https://img.shields.io/badge/language-Python%203-blue.svg"/>
 </center>
 
+[![Stars](https://img.shields.io/github/stars/Toad114514/plugin.video.bilikodi.svg)](https://github.com/Toad114514/plugin.video.bilikodi/status)
+[![Forks](https://img.shields.io/github/forks/Toad114514/plugin.video.bilikodi.svg)](https://github.com/Toad114514/Toad114514/network/members)
+[![Issues](https://img.shields.io/github/issues/Toad114514/plugin.video.bilikodi.svg)](https://github.com/Toad114514/plugin.video.bilikodi/issues)
+[![Watchers](https://img.shields.io/github/watchers/Toad114514/plugin.video.bilikodi.svg)](https://github.com/Toad114514/plugin.video.bilikodi/watchers)<br>
+[![GitHub Tag](https://img.shields.io/github/v/tag/toad114514/plugin.video.bilikodi)](https://github.com/Toad114514/plugin.video.bilikodi/releases)
+[![Python](https://img.shields.io/badge/language-Python%203-blue.svg)](https://www.python.org)
 # 简介
 神秘的**非第三方**b站客户端的 Kodi 20.2 实现  
 允许你在kodi上任意浏览b站上的视频（目前在 Nexus 20 测试通过）  
