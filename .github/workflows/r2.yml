@@ -22,11 +22,9 @@ jobs:
       - name: Get release tag
         id: get_tag
         run: |
-          # 推送标签触发时获取标签
           if [[ ${{ github.event_name }} == 'push' ]]; then
             echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           else
-            # 手动触发时使用输入值
             echo "TAG_NAME=${{ inputs.tag_name }}" >> $GITHUB_OUTPUT
           fi
 
