@@ -50,27 +50,20 @@ jobs:
           # 生成两次release间的提交日志
           echo "COMMITS=$(git log --pretty=format:"- %s (%h)" ${{ steps.get_previous_tag.outputs.PREV_TAG }}..${{ steps.get_tag.outputs.TAG_NAME }})" >> $GITHUB_OUTPUT
 
+      - name: Create source zip
+        run: |
+          git clone https://github.com/toad114514/plugin.video.bilikodi.git
+          tar -czvf plugin.video.bilikodi.tar.gz plugin.video.bilikodi
+      
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.get_tag.outputs.TAG_NAME }}
-          name: Release ${{ steps.get_tag.outputs.TAG_NAME }}
+          name: ${{ steps.get_tag.outputs.TAG_NAME }}
           body: |
             ### Changes since ${{ steps.get_previous_tag.outputs.PREV_TAG }}
             ${{ steps.changelog.outputs.COMMITS }}
           files: |
-            ${{ github.workspace }}/*.zip
+            plugin.video.bilikodi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create source zip
-        run: |
-          ZIP_NAME="${{ steps.get_tag.outputs.TAG_NAME }}.zip"
-          git archive --format=zip -o ${ZIP_NAME} HEAD
-          echo "ZIP_PATH=${ZIP_NAME}" >> $GITHUB_ENV
-
-      - name: Upload source zip
-        uses: actions/upload-artifact@v3
-        with:
-          name: source-zip
-          path: ${{ env.ZIP_PATH }}
