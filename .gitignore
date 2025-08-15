@@ -1,0 +1,5 @@
+resources/__pycache__
+resources/lib/__pycache__
+resources/config/cookies
+resources/config/qrcode.png
+resources/config/refresh_token
