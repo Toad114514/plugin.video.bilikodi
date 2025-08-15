@@ -39,6 +39,9 @@ def getbackAuto(url, headers=get_ua(), cookies=load_cookie()):
         log("Fuck you wifi!!!") # Oops, 发现我的神秘彩蛋了
         return False
     if res["code"] == 0:
+        # log("========== API Callback ==========")
+        # log(res)
+        # log("========== API Call EOF ==========")
         return res
     else:
         warDialog("[Bilikodi] 数据错误: "+str(res["code"])+"("+res["message"]+")")

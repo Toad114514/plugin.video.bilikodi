@@ -196,10 +196,13 @@ def up_fav(mid):
     if res == False:
         return
     # 好像一个用户默认都会有个默认文件夹罢
-    # if res["data"]["list"] == Null or res["data"]["list"] == None:
-        # warDialog("你的收藏夹里什么也没有。")
-        # log("神人一点东西也一点不收藏是吧")
-        # return
+    # fix: 无权限情况下返回为空数据（code为0）
+    try:
+        test=res["data"]["list"]
+    except:
+        warDialog("没有任何收藏夹，可能你没有权限访问。")
+        log(mid2+" 收藏夹为空")
+        return
     xbmcplugin.setPluginCategory(HANDLE, "收藏夹")
     for data in res["data"]["list"]:
         plot=data["title"]+"\n\n共收藏 "+str(data["media_count"])+" 个视频"
