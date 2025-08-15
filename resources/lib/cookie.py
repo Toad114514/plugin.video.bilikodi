@@ -25,9 +25,13 @@ def save_cookie(rep):
         json.dump(dictc, f, indent=4)
         
 def load_cookie():
-    with open(os.path.join(ADDON_PATH, "resources", "config", "cookies"),"r") as f:
-        dictc = json.loads(f.read())
-    return req.utils.cookiejar_from_dict(dictc)
+    try:
+        with open(os.path.join(ADDON_PATH, "resources", "config", "cookies"),"r") as f:
+            dictc = json.loads(f.read())
+        return req.utils.cookiejar_from_dict(dictc)
+    except:
+        c.log("无cookies。")
+        return False
 
 # 旧 cookies
 def save_cookie_old():
