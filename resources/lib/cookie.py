@@ -21,6 +21,8 @@ def save_cookie(rep):
     # 如用户基础信息APi
     dictc["a"] = ""
     dictc["b"] = ""
+    # buvid3
+    dictc["buvid"]=get_buvid()
     with open(os.path.join(ADDON_PATH, "resources", "config", "cookies"),"w") as f:
         json.dump(dictc, f, indent=4)
         
@@ -69,6 +71,12 @@ def get_mid():
     if res["code"] != 0:
         return 0
     return res["data"]["mid"]
+
+def get_buvid():
+    res=getbackAuto("https://api.bilibili.com/x/web-frontend/getbuvid")
+    if res != False:
+        return res["data"]["buvid"]
+
 
 # 网页端 Cookies 刷新实现代码
 # 可能有bug。

@@ -22,6 +22,7 @@ def getback_c(url, UA_head, c=load_cookie()):
         xbmc.log(res_text)
         res_text=json.loads(res_text)
         if res_text["code"] == 0:
+            log(res_text)
             return res_text
         else:
             warDialog("[Bilikodi] 数据返回错误码: "+str(res_text["code"]))
@@ -64,3 +65,19 @@ def getback(url, UA_head):
         xbmc.log("[Bilikodi] 无法解析 json 数据")
         xbmc.log(res_text)
         return False
+
+# POST
+def postbackAuto(url, p, h=get_ua(), c=load_cookie()):
+    try:
+        res=requests.post(url, data=p, headers=h, cookies=c).json()
+    except:
+        warDialog("网络不好或无法解析")
+        log("Fuck you wifi/API return!!!")
+        return False
+    if res["code"] == 0:
+        return res
+    else:
+        warDialog("[Bilikodi] 数据错误: "+str(res["code"])+"("+res["message"]+")")
+        log("Fuck API return (POST) "+str(res["code"]))
+        return False
+    

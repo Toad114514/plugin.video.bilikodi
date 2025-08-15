@@ -17,7 +17,7 @@ from resources.lib.core import *
 from resources.lib.up import *
 from resources.lib.action import *
 #version
-version="v1.0.32"
+version="v1.0.41"
 dev=True
 
 # urls
@@ -90,47 +90,6 @@ def tp_user_get():
             getuserinfo(keyword)
     else:
         keyword = ""
-###########
-# series and archive
-###########
-
-def season_list(mid):
-    headers=UA_head
-    headers["referer"]=".bilibili.com"
-    query=wbi.getwbikey({
-      'mid': mid,
-      'page_num': 1,
-      'page_size': 20
-    })
-    try:
-        # res=requests.get("https://api.bilibili.com/x/polymer/web-space/seasons_series_list?mid="+mid+"&page_num=1&page_size=20&w_rid=03b4190fbc78ab21a46bade3e32a5064&wts=1706173818", headers=UA_head)
-        res=requests.get("https://api.bilibili.com/x/polymer/web-space/seasons_series_list?"+query, headers=headers)
-        res_text=res.text
-    except requests.exceptions.RequestException as e:
-        res_text=""
-        warDialog("无法从网上获取 json 数据")
-    if check_json(res_text):
-        res_json=json.loads(res_text)
-        if res_json["code"] == 0:
-            xbmcplugin.setPluginCategory(HANDLE, '合集')
-            if len(res_json["data"]["items_lists"]["season_list"]) > 0:
-                for season in res_json["data"]["items_lists"]["season_list"]:
-                    list_item = xbmcgui.ListItem(season["meta"]["name"])
-                    url = get_url(action='season', id=str(season["meta"]["season_id"]))
-                    plot=series["meta"]["description"]
-                    list_item.getVideoInfoTag().setPlot(plot)
-                    list_item.getVideoInfoTag().setPlot(plot)
-                    list_item.setArt({'icon': series["meta"]["cover"], 'fanart': series["meta"]["cover"]})
-                    xbmcplugin.addDirectoryItem(HANDLE, url, list_item, True)
-                xbmcplugin.endOfDirectory(HANDLE)
-            else:
-                warDialog("这里连吊都没有")
-        else:
-            warDialog("数据返回了错误的代码: "+str(res_json["code"]))
-            log(res_text)
-    else:
-        warDialog("无法解析 json 数据")
-        log(res_text)
 #######
 # MenuList
 #######
@@ -175,6 +134,7 @@ def mainmenu():
             ]
         )
         addXbmcItemInfo("新版播放详情框架","player_test","Debug Option.\nThe new video info to show in development state.[WIP]",True)
+        addXbmcItemInfo("like","like_test","r",True)
         addXbmcItemInfo("wbikey","wbikey","Debug Option",True)
         addXbmcItemInfo("立即申请刷新 cookie 测试","ref_cookie","Debug Option",True)
     xbmcplugin.endOfDirectory(HANDLE)
@@ -204,8 +164,8 @@ def gethomevideo(pn=1):
                 fanart=video["pic"],
                 is_media=True,
                 context=[
-                  ("查看详细信息(会刷新推荐)", f"Container.Update(plugin://plugin.video.bilikodi/?action=player&bv={bv})"),
-                  ("跳转至UP主(同上)", f"Container.Update(plugin://plugin.video.bilikodi/?action=ups_info&mid={mid})")
+                  ("查看详细信息", f"Container.Update(plugin://plugin.video.bilikodi/?action=player&bv={bv})"),
+                  ("跳转至UP主", f"Container.Update(plugin://plugin.video.bilikodi/?action=ups_info&mid={mid})")
                   ]
                 )
         # Next Pages
@@ -354,7 +314,11 @@ def router(pars):
         cookie_ref(True)
     elif params["action"] == "player_test":
         play_info("BV1k7JazfEV2", 0) # 睡前必看，来自星野大叔的睡前问候
-        #play_info(113961538292695, 1) # linux大战比尔·盖茨 (2009年) (try get info by aid number.)
+        #play_info(113961538292695, 1) # linux大战比尔·盖茨 (2009年) (by aid number.)
+    elif params["action"] == "like_test":
+        # 这里个人测试出现 -403 账号异常，有谁能帮忙测试一下口牙
+        # cookies buvid3和csrf检测看了也没有问题
+        like_action("BV1mmbgzwEEU") # 纸片马力欧的神人视频 别点开看！
     else:
         raise ValueError(f'Invalid paramstring: {pars}!')
 
@@ -371,9 +335,9 @@ if __name__ == '__main__':
         # 仅允许通过 by qrcode
         if sys.argv[2][1:] == "action=qrcode":
             router(sys.argv[2][1:])
+            sys.exit()
         else:
             sys.exit()
     router(sys.argv[2][1:])
-    like_action("114514")
     log(sys.argv[2][1:])
     
