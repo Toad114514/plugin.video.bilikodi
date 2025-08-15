@@ -155,6 +155,7 @@ def mainmenu():
         icon=get_img("user")
     )
     addXbmcItemCustom("自己的用户信息",get_url(action="ups_me"),"看看你自己",True,icon=get_img("user"))
+    addXbmcItemCustom("个人收藏夹",get_url(action="ups_fav", mid=get_mid()),"bro你喜欢的都在这了",True)
     # addXbmcItemInfo("搜索","search","这个还没完善你先死一边去",True)
     addXbmcItem("跳转到...","tp",True)
     addXbmcItem("帮助","helper",True)
@@ -334,12 +335,10 @@ def router(pars):
         up_sub(params["mid"])
     elif params["action"] == "ups_send":
         up_video(params["mid"], pn=params["pn"])
-    elif params["action"] == "dynamic_get":
-        getuserdynamic(params["mid"], params["page"])
-    elif params["action"] == "getuserinfo":
-        getuserinfo(params["mid"])
-    elif params["action"] == "season":
-        season_list(params["mid"])
+    elif params["action"] == "ups_fav":
+        up_fav(params["mid"])
+    elif params["action"] == "ups_fav_2nd":
+        up_fav_2nd(params["fid"], params["p"])
     # Tp_list
     elif params["action"] == "tp":
         tp_list()

@@ -105,7 +105,7 @@ def up_info(mid):
     ## Others
     items=[
       {'name': '投稿视频', 'params': get_url(action="ups_send", mid=mid, pn=1)},
-      {'name': '用户收藏', 'params': get_url(action="ups_fav")},
+      {'name': '用户收藏', 'params': get_url(action="ups_fav", mid=mid)},
       {'name': '关注列表', 'params': get_url(action="ups_sub", mid=mid)}
     ]
     for x in items:
@@ -144,5 +144,73 @@ def up_sub(mid, page=1, ps=30):
           plot,
           True,
           icon=data["face"]
+        )
+    xbmcplugin.endOfDirectory(HANDLE)
+
+"""
+收藏夹元数据
+"""
+def up_fav_2nd(idx, p):
+    idx2=str(idx)
+    p2=str(p)
+    res=getbackAuto(f"https://api.bilibili.com/x/v3/fav/resource/list?media_id={idx2}&order=mtime&ps=20&pn={p2}")
+    if res == False:
+        return
+    xbmcplugin.setPluginCategory(HANDLE, "收藏夹/"+res["data"]["info"]["title"])
+    total=res["data"]["info"]["media_count"]
+    for d in res["data"]["medias"]:
+        if d["type"] != 12 and d["attr"] == 0:
+            plot=str(d["cnt_info"]["play"])+" 播放  "+str(d["cnt_info"]["danmaku"])+" 弹幕"
+            plot+="\nUp主: "+d["upper"]["name"]+" [COLOR=grey]("+str(d["upper"]["mid"])+")[/COLOR]"
+            plot+="\n"+unix2time(d["pubtime"])+" 发布"
+            plot+="\n[COLOR=yellow]"+unix2time(d["fav_time"])+" 收藏[/COLOR]"
+            plot+="\n\n"+d["intro"]
+            addXbmcItemCustom(
+              d["title"],
+              get_url(action="bvplay", bv=d["bvid"]),
+              plot,
+              False,
+              is_media=True,
+              icon=d["cover"],
+              fanart=d["cover"]
+            )
+    pages=int(total / 20)
+    # 余数多一页显示
+    if total % 20 != 0:
+        pages+=1
+    if pages > int(p):
+        i={'name': "[COLOR=yellow]下一页[/COLOR] ("+str(p)+"/"+str(pages)+")", 'url': get_url(action="ups_fav_2nd", fid=idx, p=int(p)+1)}
+    else:
+        i={'name': "[COLOR=grey]页面最底处[/COLOR] ("+str(pages)+"/"+str(p)+")", 'url': get_url(action="not")}
+    addXbmcItemCustom(
+        i["name"],
+        i["url"],
+        "跳到下一页使的，或者可能你到底了",
+        True
+    )
+    xbmcplugin.endOfDirectory(HANDLE)
+
+def up_fav(mid):
+    mid2=str(mid)
+    res=getbackAuto(f"https://api.bilibili.com/x/v3/fav/folder/created/list-all?up_mid={mid2}")
+    if res == False:
+        return
+    # 好像一个用户默认都会有个默认文件夹罢
+    # if res["data"]["list"] == Null or res["data"]["list"] == None:
+        # warDialog("你的收藏夹里什么也没有。")
+        # log("神人一点东西也一点不收藏是吧")
+        # return
+    xbmcplugin.setPluginCategory(HANDLE, "收藏夹")
+    for data in res["data"]["list"]:
+        plot=data["title"]+"\n\n共收藏 "+str(data["media_count"])+" 个视频"
+        if int(str(data["attr"])[0]) == 0:
+            plot+="\n[COLOR=yellow]公开收藏夹[/COLOR]"
+        if int(str(data["attr"])[0]) == 1:
+            plot+="\n[COLOR=yellow]私有收藏夹[/COLOR]"
+        addXbmcItemCustom(
+          data["title"],
+          get_url(action="ups_fav_2nd", fid=data["id"], p=1),
+          plot,
+          True
         )
     xbmcplugin.endOfDirectory(HANDLE)
