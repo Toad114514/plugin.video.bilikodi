@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.bilikodi" name="bilikodi" version="1.0.30+0719" provider-name="toad114514">
+<addon id="plugin.video.bilikodi" name="bilikodi" version="1.0.44+0816" provider-name="toad114514">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.requests" version="2.12.4"/>
@@ -32,7 +32,17 @@
 本插件仅供学习参考使用，本插件不会通过任何手段收集你的信息。
 （我都没钱开服务器我还收集我收你个鸡毛）
     </disclaimer>
-  <news># 1.0.42
+  <news>
+# 1.0.44+0816
+fix: 收藏夹为空的bug（权限的事）
+# 1.0.43
+点赞功能实现（我这里测试不了弹 -403，对应主页面 like）
+删去无用代码
+fix: 登录完成后出现“不要重复登录！”的bug
+chore: up主投稿部分添加了自定义菜单上下文
+# 1.0.42-rc2
+fix: 神秘的 FileNotFound
+# 1.0.42
 重构主页推荐函数
 # 1.0.41
 主页翻页实现

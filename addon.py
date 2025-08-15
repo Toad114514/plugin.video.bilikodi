@@ -17,7 +17,7 @@ from resources.lib.core import *
 from resources.lib.up import *
 from resources.lib.action import *
 #version
-version="v1.0.41"
+version="v1.0.42"
 dev=True
 
 # urls
