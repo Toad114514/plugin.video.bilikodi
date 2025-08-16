@@ -32,6 +32,7 @@ Version: v1.0.44+0816
  - 加密风控
    - wbi_key
    - cookies 刷新(未测试，没有正式启用)
+ - [fuckmycode](./fuck-my-code.md)
 # 鸣谢和声明
 [SocialSisterYi/bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect) - 收集了大量的b站api用于本插件的运作  
 本插件与哔哩哔哩官方没有任何关系，也没有受到哔哩哔哩官方的允许。  
