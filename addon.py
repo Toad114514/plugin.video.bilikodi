@@ -94,6 +94,22 @@ def tp_user_get():
 # MenuList
 #######
 
+def dev_menu():
+    addXbmcItemCustom(
+            "特别警告！！",
+            get_url(action="dev"),
+            "特别警告，长按测试上下文菜单",
+            True,
+            context=[
+             ("Hello", "RunPlugin(plugin://plugin.video.bilikodi/?action=dev)"),
+             ("Me too", "RunPlugin(plugin://plugin.video.bilikodi/?action=helper)")
+            ]
+        )
+    addXbmcItemInfo("新版播放详情框架","player_test","Debug Option.\nThe new video info to show in development state.[WIP]",True)
+    addXbmcItemInfo("like","like_test","r",True)
+    addXbmcItemInfo("wbikey","wbikey","Debug Option",True)
+    addXbmcItemInfo("立即申请刷新 cookie 测试","ref_cookie","Debug Option",True)
+
 def mainmenu():
     if os.path.exists(os.path.join(ADDON_TempDir, "temp_video")) == False:
         os.mkdir(ADDON_TempDir)
@@ -106,13 +122,7 @@ def mainmenu():
     # home tuijian
     addXbmcItemCustom("推荐视频",get_url(action="home", pn=1),"b站的主页视频推荐",True)
     addXbmcItem("前 100","top100",True)
-    addXbmcItemCustom(
-        "关注列表",
-        get_url(action="ups_sub", mid=get_mid()),
-        "你最喜欢的关注的佬",
-        True,
-        icon=get_img("user")
-    )
+    addXbmcItemCustom("关注列表",get_url(action="ups_sub", mid=get_mid()),"你最喜欢的关注的佬",True,icon=get_img("user"))
     addXbmcItemCustom("自己的用户信息",get_url(action="ups_me"),"看看你自己",True,icon=get_img("user"))
     addXbmcItemCustom("个人收藏夹",get_url(action="ups_fav", mid=get_mid()),"bro你喜欢的都在这了",True)
     # addXbmcItemInfo("搜索","search","这个还没完善你先死一边去",True)
@@ -123,20 +133,7 @@ def mainmenu():
     Development Menu Items
     """
     if dev:
-        addXbmcItemCustom(
-            "特别警告！！",
-            get_url(action="dev"),
-            "特别警告，长按测试上下文菜单",
-            True,
-            context=[
-             ("Hello", "RunPlugin(plugin://plugin.video.bilikodi/?action=dev)"),
-             ("Me too", "RunPlugin(plugin://plugin.video.bilikodi/?action=helper)")
-            ]
-        )
-        addXbmcItemInfo("新版播放详情框架","player_test","Debug Option.\nThe new video info to show in development state.[WIP]",True)
-        addXbmcItemInfo("like","like_test","r",True)
-        addXbmcItemInfo("wbikey","wbikey","Debug Option",True)
-        addXbmcItemInfo("立即申请刷新 cookie 测试","ref_cookie","Debug Option",True)
+        dev_menu()
     xbmcplugin.endOfDirectory(HANDLE)
 
 def gethomevideo(pn=1):
