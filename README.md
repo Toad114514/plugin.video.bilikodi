@@ -1,6 +1,7 @@
 # Bilikodi
 
 <center>
+发现我以前25写的代码有点太神作于是永久关闭此仓库，只能查看源代码，新版的重构版在这里 ==> <a href="https://github.com/Toad114514/plugin.video.bilikodiRe">BilikodiReborn</a>
 <img src="https://raw.github.com/Toad114514/plugin.video.bilikodi/refs/heads/main/icon.png" width="150" height="150"/>
 关于我找不到kodi的b站客户端于是自己手搓这件事<br>
 Version: v1.0.44+0816
